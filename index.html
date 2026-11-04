@@ -709,7 +709,7 @@ function afterChange() { Sync.schedule(); if (typeof UI !== 'undefined') UI.refr
 
 /* ---------- Configuración de la finca (se sincroniza entre dispositivos) ---------- */
 const DEFAULT_SETTINGS = {
-  finca: 'Mi chacra', moneda: 'S/', lat: null, lon: null,
+  chacra: 'Mi chacra', moneda: 'S/', lat: null, lon: null,
   umbral_helada: 2, umbral_lluvia: 20, umbral_viento: 45,
   dias_cosecha: 15, dias_aplicacion: 3, dias_contrato: 30,
 };
@@ -1774,7 +1774,7 @@ const UI = {
       <section class="login-side">
         <div class="brand"><span class="brand-mark">${ico('sprout')}</span>AgroGestión</div>
         <div>
-          <h1 class="login-title">Tu finca, campaña por campaña.</h1>
+          <h1 class="login-title">Tu chacra, campaña por campaña.</h1>
           <p>Costos, labores y cosechas de cada lote, desde el campo o la oficina, con o sin señal.</p>
         </div>
         <div class="login-rows" aria-hidden="true">${bars.map(([n, w]) => `<div class="login-row"><span>${n}</span><div class="bar"><span style="width:${w}%"></span></div></div>`).join('')}</div>
@@ -1824,7 +1824,7 @@ const UI = {
     const s = Auth.session;
     $('#sidebar').innerHTML = `
       <div class="brand"><span class="brand-mark">${ico('sprout')}</span>AgroGestión</div>
-      <div class="farm-name" id="farmName">${esc(S().finca)}</div>
+      <div class="farm-name" id="farmName">${esc(S().chacra)}</div>
       ${NAV.map((g) => {
         const items = g.items.filter(([r]) => Auth.can(r));
         if (!items.length) return '';
@@ -1838,7 +1838,7 @@ const UI = {
     if ($('#app').hidden) return;
     const n = computeAlerts().filter((a) => a.lvl !== 'baja').length;
     ['#navAlertCount', '#bnAlertCount'].forEach((sel) => { const el = $(sel); if (el) { el.hidden = !n; el.textContent = n; } });
-    const fn = $('#farmName'); if (fn) fn.textContent = S().finca;
+    const fn = $('#farmName'); if (fn) fn.textContent = S().chacra;
     this.updateSync();
   },
   updateSync() {
@@ -2005,12 +2005,12 @@ function viewAlertas() {
 function viewDashboard() {
   const s = S(); const cy = new Date().getFullYear(); const t = today();
   if (!all('lotes').length && !all('campanas').length) {
-    return `<div class="page">${pageHead(s.finca, 'Empieza registrando tus lotes y la campaña que tienes sembrada. También puedes explorar el sistema con datos de ejemplo.')}
+    return `<div class="page">${pageHead(s.chacra, 'Empieza registrando tus lotes y la campaña que tienes sembrada. También puedes explorar el sistema con datos de ejemplo.')}
       <div class="panel"><h3>Primeros pasos</h3>
         <div class="tiles">
           <button class="tile" data-new="lotes">${ico('map')}<b>Registrar un lote</b><span>Nombre, área, suelo y ubicación</span></button>
           <button class="tile" data-new="campanas">${ico('sprout')}<b>Registrar una campaña</b><span>Cultivo, siembra y cosecha estimada</span></button>
-          <button class="tile" data-go="config">${ico('sliders')}<b>Configurar la finca</b><span>Moneda, ubicación y avisos</span></button>
+          <button class="tile" data-go="config">${ico('sliders')}<b>Configurar la chacra</b><span>Moneda, ubicación y avisos</span></button>
           <button class="tile" data-act="demo">${ico('chart')}<b>Explorar con datos de ejemplo</b><span>Tres años de campañas simuladas</span></button>
         </div></div></div>`;
   }
@@ -2045,7 +2045,7 @@ function viewDashboard() {
   });
   const c = Clima.coords(); const fc = c ? Clima.get(c.lat, c.lon) : null;
   return `<div class="page">
-    ${pageHead(s.finca, `${fecha.charAt(0).toUpperCase() + fecha.slice(1)}. ${activas.length} campaña(s) en curso en ${fmtNum(ha, 1)} ha.`, `<button class="btn maize" data-act="quick">${ico('plus')} Registro rápido</button>${newBtn('campanas', 'Nueva campaña', null, '')}`)}
+    ${pageHead(s.chacra, `${fecha.charAt(0).toUpperCase() + fecha.slice(1)}. ${activas.length} campaña(s) en curso en ${fmtNum(ha, 1)} ha.`, `<button class="btn maize" data-act="quick">${ico('plus')} Registro rápido</button>${newBtn('campanas', 'Nueva campaña', null, '')}`)}
     <div class="panel"><h3>En el campo ahora<span class="spacer"></span><a class="small" href="#campanas">Todas las campañas</a></h3>
       ${strip.length ? `<div class="season">${strip.map(seasonRow).join('')}</div>` : `<div class="empty">No hay campañas en curso. ${newBtn('campanas', 'Registrar campaña')}</div>`}
     </div>
@@ -2064,7 +2064,7 @@ function viewDashboard() {
     </div>
     <div class="grid-3">
       <div class="panel"><h3>Margen por hectárea y cultivo</h3>${cerr.length ? '<div class="chart-box short"><canvas id="chCultivo" aria-label="Margen por hectárea por cultivo"></canvas></div><p class="small muted" style="margin:8px 0 0">Campañas cosechadas o cerradas. Detalle en Analítica.</p>' : '<div class="empty">Aparecerá al cerrar tu primera campaña.</div>'}</div>
-      <div class="panel"><h3>Pronóstico 7 días<span class="spacer"></span><a class="small" href="#clima">Clima</a></h3>${fc ? Clima.forecastHtml(fc, true) : `<div class="empty">${c ? 'Sin pronóstico guardado. Se descargará al tener conexión.' : 'Configura la ubicación de la finca para ver el pronóstico.'}<br><button class="btn sm" data-go="${c ? 'clima' : 'config'}">${c ? 'Ir a clima' : 'Configurar'}</button></div>`}</div>
+      <div class="panel"><h3>Pronóstico 7 días<span class="spacer"></span><a class="small" href="#clima">Clima</a></h3>${fc ? Clima.forecastHtml(fc, true) : `<div class="empty">${c ? 'Sin pronóstico guardado. Se descargará al tener conexión.' : 'Configura la ubicación de la chacra para ver el pronóstico.'}<br><button class="btn sm" data-go="${c ? 'clima' : 'config'}">${c ? 'Ir a clima' : 'Configurar'}</button></div>`}</div>
       <div class="panel"><h3>Inventario crítico<span class="spacer"></span><a class="small" href="#insumos">Inventario</a></h3>
         ${low.length ? `<div class="alert-list">${low.slice(0, 5).map((i) => { const st = stockInsumo(i.id); return `<div class="alert ${st <= 0 ? 'alta' : 'media'}"><span class="lvl"></span><div><div class="alert-title">${esc(i.nombre)}</div><div class="alert-detail">${fmtNum(st, 1)} ${esc(i.unidad || '')} de ${fmtNum(i.stock_minimo, 1)} mínimo</div></div><div class="actions"><button class="btn sm" data-act="comprar" data-id="${i.id}">Comprar</button></div></div>`; }).join('')}</div>` : '<div class="empty">Todos los insumos están sobre el mínimo.</div>'}</div>
     </div></div>`;
@@ -2378,9 +2378,9 @@ function viewAnalitica() {
 const Clima = {
   key: (lat, lon) => `${Number(lat).toFixed(2)},${Number(lon).toFixed(2)}`,
   valid: (lat, lon) => lat !== null && lat !== undefined && lat !== '' && lon !== null && lon !== undefined && lon !== '' && Number.isFinite(Number(lat)) && Number.isFinite(Number(lon)),
-  coords() { const s = S(); return this.valid(s.lat, s.lon) ? { lat: Number(s.lat), lon: Number(s.lon), nombre: s.finca } : null; },
+  coords() { const s = S(); return this.valid(s.lat, s.lon) ? { lat: Number(s.lat), lon: Number(s.lon), nombre: s.chacra } : null; },
   locations() {
-    const out = []; const c = this.coords(); if (c) out.push({ id: 'finca', ...c, nombre: `Finca (${c.nombre})` });
+    const out = []; const c = this.coords(); if (c) out.push({ id: 'chacra', ...c, nombre: `Chacra (${c.nombre})` });
     all('lotes').filter((l) => this.valid(l.lat, l.lon)).forEach((l) => out.push({ id: l.id, lat: Number(l.lat), lon: Number(l.lon), nombre: l.nombre }));
     return out;
   },
@@ -2436,7 +2436,7 @@ const Clima = {
   async fetchHistorico(c) {
     const l = byId('lotes', c.lote_id);
     const loc = l && this.valid(l.lat, l.lon) ? { lat: Number(l.lat), lon: Number(l.lon) } : this.coords();
-    if (!loc) throw new Error('Registra las coordenadas del lote o de la finca para consultar el clima.');
+    if (!loc) throw new Error('Registra las coordenadas del lote o de la chacra para consultar el clima.');
     if (!c.fecha_siembra) throw new Error('La campaña necesita fecha de siembra.');
     let fin = c.fecha_cosecha_real || c.fecha_cosecha_est || today();
     const lim = addDays(today(), -6); if (fin > lim) fin = lim;
@@ -2464,7 +2464,7 @@ function viewClima() {
   const s = S();
   return `<div class="page">
     ${pageHead('Clima', `Pronóstico de 7 días y alertas de helada (≤ ${fmtNum(s.umbral_helada)} °C), lluvia intensa (≥ ${fmtNum(s.umbral_lluvia)} mm) y viento. Los datos se guardan para consultarlos sin señal.`, newBtn('clima_eventos', 'Registrar evento'))}
-    ${!locs.length ? '<div class="banner warn row">Falta la ubicación. Regístrala en Configuración (finca) o en cada lote con el botón GPS.<button class="btn sm" data-go="config">Configurar</button></div>' : ''}
+    ${!locs.length ? '<div class="banner warn row">Falta la ubicación. Regístrala en Configuración (chacra) o en cada lote con el botón GPS.<button class="btn sm" data-go="config">Configurar</button></div>' : ''}
     ${loc ? `<div class="panel"><h3>Pronóstico<span class="spacer"></span>
       <select data-vfilter="clima:loc" aria-label="Ubicación" style="max-width:260px;min-height:38px">${locs.map((l) => `<option value="${l.id}" ${l.id === loc.id ? 'selected' : ''}>${esc(l.nombre)}</option>`).join('')}</select>
       <button class="btn sm" data-act="clima-refresh" data-id="${loc.lat},${loc.lon}">${ico('refresh')} Actualizar</button></h3>
@@ -2479,7 +2479,7 @@ function viewClima() {
         { label: 'Heladas', render: (c) => (c.clima ? fmtNum(c.clima.dias_helada) : '—'), n: true },
         { label: '', render: (c) => `<button class="btn sm" data-act="clima-hist" data-id="${c.id}">${c.clima ? 'Actualizar' : 'Obtener'}</button>` },
       ], camps, { empty: 'Registra campañas para consultar su historial climático.' })}
-      <p class="small muted" style="margin-bottom:0">Datos diarios de Open-Meteo para las coordenadas del lote (o de la finca). Se guardan en la campaña y se usan en Analítica.</p>
+      <p class="small muted" style="margin-bottom:0">Datos diarios de Open-Meteo para las coordenadas del lote (o de la chacra). Se guardan en la campaña y se usan en Analítica.</p>
     </div>
     <div class="panel"><h3>Eventos registrados en campo</h3>${tableHtml(SCHEMAS.clima_eventos.cols, ev, { rowAttr: (r) => `class="click" data-edit="clima_eventos:${r.id}"`, empty: 'Sin eventos registrados.' })}</div>
   </div>`;
@@ -2493,7 +2493,7 @@ function viewConfig() {
   post(() => {
     $('#setForm')?.addEventListener('submit', async (e) => {
       e.preventDefault(); const f = e.target.elements; const n = (k) => (f[k].value === '' ? null : Number(f[k].value));
-      await saveSettings({ finca: f.finca.value.trim() || 'Mi finca', moneda: f.moneda.value.trim() || 'S/', lat: n('lat'), lon: n('lon'), umbral_helada: n('umbral_helada') ?? 2, umbral_lluvia: n('umbral_lluvia') ?? 20, umbral_viento: n('umbral_viento') ?? 45, dias_cosecha: n('dias_cosecha') ?? 15, dias_aplicacion: n('dias_aplicacion') ?? 3, dias_contrato: n('dias_contrato') ?? 30 });
+      await saveSettings({ chacra: f.chacra.value.trim() || 'Mi chacra', moneda: f.moneda.value.trim() || 'S/', lat: n('lat'), lon: n('lon'), umbral_helada: n('umbral_helada') ?? 2, umbral_lluvia: n('umbral_lluvia') ?? 20, umbral_viento: n('umbral_viento') ?? 45, dias_cosecha: n('dias_cosecha') ?? 15, dias_aplicacion: n('dias_aplicacion') ?? 3, dias_contrato: n('dias_contrato') ?? 30 });
       toast('Configuración guardada'); Clima.autoRefresh(); UI.softRefresh();
     });
     $('#remoteForm')?.addEventListener('submit', async (e) => {
@@ -2524,11 +2524,11 @@ function viewConfig() {
          <div class="full actions"><button class="btn primary" type="submit">Guardar y conectar</button></div>
        </form>`;
   return `<div class="page">
-    ${pageHead('Configuración', 'Datos de la finca, avisos, sincronización y respaldos.')}
+    ${pageHead('Configuración', 'Datos de la chacra, avisos, sincronización y respaldos.')}
     <div class="grid-2">
-      <div class="panel"><h3>Finca y avisos</h3>
+      <div class="panel"><h3>Chacra y avisos</h3>
         <form id="setForm" class="grid-form">
-          ${fld('finca', 'Nombre de la finca', s.finca, 'text')}${fld('moneda', 'Símbolo de moneda', s.moneda, 'text')}
+          ${fld('chacra', 'Nombre de la chacra', s.chacra, 'text')}${fld('moneda', 'Símbolo de moneda', s.moneda, 'text')}
           ${fld('lat', 'Latitud', s.lat, 'number', 'Para pronóstico y alertas de clima')}${fld('lon', 'Longitud', s.lon)}
           <div class="full"><button type="button" class="btn sm" data-act="gps">${ico('pin')} Usar mi ubicación (GPS)</button></div>
           ${fld('umbral_helada', 'Alerta de helada (°C mínima)', s.umbral_helada)}${fld('umbral_lluvia', 'Alerta de lluvia (mm por día)', s.umbral_lluvia)}
@@ -2722,7 +2722,7 @@ async function loadDemo() {
   const r2 = (n) => Math.round(n * 100) / 100;
 
   const patch = {}; const s = S();
-  if (s.finca === 'Mi finca') patch.finca = 'Fundo Santa Elena';
+  if (s.chacra === 'Mi chacra') patch.chacra = 'Fundo San Antonio de Matua';
   if (!Clima.coords()) { patch.lat = -12.07; patch.lon = -75.21; }
   if (Object.keys(patch).length) await saveSettings(patch);
 
@@ -2732,7 +2732,7 @@ async function loadDemo() {
   const C1 = add('contactos', { nombre: 'Mercado Mayorista de Huancayo', tipo: 'Cliente', rubro: 'Papa y maíz', telefono: '964 555 666' });
   const C2 = add('contactos', { nombre: 'Acopio Agroexport Junín', tipo: 'Cliente', documento: '20512345678', rubro: 'Quinua para exportación' });
   const A1 = add('contactos', { nombre: 'Teodoro Quispe', tipo: 'Arrendador', documento: '20123456', telefono: '964 777 888' });
-  const S1 = add('contactos', { nombre: 'Socio de la finca (ejemplo)', tipo: 'Socio' });
+  const S1 = add('contactos', { nombre: 'Socio de la chacra (ejemplo)', tipo: 'Socio' });
 
   // Lotes
   const lotes = {
@@ -2892,7 +2892,7 @@ async function loadDemo() {
 
   // Contratos
   add('contratos', { tipo: 'Arrendamiento de tierra', codigo: 'ARR-01', contacto_id: A1, lote_id: lotes.L3.id, fecha_inicio: `${Y - 2}-09-01`, fecha_fin: addDays(t, 25), monto: 5000, periodicidad: 'Por campaña', alerta_dias: 30, condiciones: 'S/ 2 500 por hectárea por campaña, pago adelantado. Renovación con 30 días de aviso.' });
-  add('contratos', { tipo: 'Socio / asociación', codigo: 'SOC-01', contacto_id: S1, fecha_inicio: `${Y - 3}-08-01`, fecha_fin: `${Y + 1}-07-31`, porcentaje: 50, periodicidad: 'Por campaña', alerta_dias: 60, condiciones: 'Reparto 50/50 de la utilidad de cada campaña. El socio aporta capital de trabajo; la finca aporta tierra, maquinaria y gestión.' });
+  add('contratos', { tipo: 'Socio / asociación', codigo: 'SOC-01', contacto_id: S1, fecha_inicio: `${Y - 3}-08-01`, fecha_fin: `${Y + 1}-07-31`, porcentaje: 50, periodicidad: 'Por campaña', alerta_dias: 60, condiciones: 'Reparto 50/50 de la utilidad de cada campaña. El socio aporta capital de trabajo; la chacra aporta tierra, maquinaria y gestión.' });
   add('contratos', { tipo: 'Cliente', codigo: 'VEN-07', contacto_id: C1, fecha_inicio: `${Y}-01-15`, fecha_fin: addDays(t, 70), periodicidad: 'Único', alerta_dias: 30, condiciones: 'Compromiso de compra de papa a precio de mercado, entrega en chacra.' });
   add('contratos', { tipo: 'Proveedor', codigo: 'CRE-02', contacto_id: P1, fecha_inicio: `${Y - 1}-10-01`, fecha_fin: addDays(t, -6), monto: 15000, periodicidad: 'Único', alerta_dias: 30, condiciones: 'Línea de crédito de insumos a 60 días.' });
 
